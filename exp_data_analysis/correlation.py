@@ -15,6 +15,10 @@ dm.replace_cols_with_nan(df, ["price"])
 dm.replace_cols_with_mean(df, ["price"])
 df["price"] = df["price"].astype("float")
 
+#Print the correlation between each columns in a df
+print("Correlation between each categories:\n")
+print(df.corr())
+
 
 #Plot Correlation
 #positive correlation

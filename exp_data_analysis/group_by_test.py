@@ -25,5 +25,5 @@ print(df_grp)
 #PIVOT
 print('\n')
 print("PIVOT Table DEMO")
-df_pivot = df_grp.pivot(index='drive-wheels', columns=['body-style'])
+df_pivot = df_grp.pivot(index='drive-wheels',columns='body-style')
 print(df_pivot)
