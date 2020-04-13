@@ -1,37 +1,48 @@
-from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.pipeline import Pipeline
-from data_wrangling import dataframe_manager as dm
+import pandas as pd
+from sklearn.linear_model import LinearRegression
 import numpy as np
+import seaborn as sns
 
-location = "https://s3-api.us-geo.objectstorage.softlayer.net/cf-courses-data/CognitiveClass/DA0101EN/auto.csv"
-headers = ["symboling", "normalized-losses", "make", "fuel-type", "aspiration", "num-of-doors", "body-style",
-           "drive-wheels", "engine-location", "wheel-base", "length", "width", "height", "curb-weight", "engine-type",
-           "num-of-cylinders", "engine-size", "fuel-system", "bore", "stroke", "compression-ratio", "horsepower",
-           "peak-rpm", "city-mpg", "highway-mpg", "price"]
+path = 'https://s3-api.us-geo.objectstorage.softlayer.net/cf-courses-data/CognitiveClass/DA0101EN/automobileEDA.csv'
+df = pd.read_csv(path)
+df.head()
 
-df = dm.get_clean_data_frame(location, headers)
-print(df.head())
-X = df[['highway-mpg', 'horsepower']]
+X = df['highway-mpg']
 Y = df['price']
+Z = df[['normalized-losses', 'highway-mpg']]
+print(df.head())
 
 # 1d Polynomial Regression
-# f = np.polyfit(X, Y, 3)
-# p = np.poly1d(f)
-# print(p)
+f = np.polyfit(X, Y, 3)
+p = np.poly1d(f)
+print(p)
 
-# # Multidimensional Polynomial Regression
-# pr = PolynomialFeatures(degree=2)
-# pr.fit_transform([X, Y])
+
+# Multidimensional Polynomial Regression
+pr = PolynomialFeatures(degree=2)
+p_mul_dim =pr.fit_transform([X, Y])
+print('p_mul_dim: ', p_mul_dim)
 
 # Scaling
-# SCALE = StandardScaler
-# SCALE.fit(X)
-# x_scale = SCALE.fit_transform(X)
+X_scale = np.array(X).reshape(-1,1)
+SCALE = StandardScaler()
+SCALE.fit(X_scale)
+X_scaled = SCALE.fit_transform(X_scale)
+print(X_scaled)
 
 # Pipeline
-# Input = [('scale', StandardScaler()), ('polynomial', PolynomialFeatures(degree=2), ('mode', LinearRegression()))]
-# pipe = Pipeline(Input)
-# pipe.fit(X, Y)
-# Yhat = pipe.predict(X)
+Input = [('scale', StandardScaler()), ('polynomial', PolynomialFeatures(include_bias=False)),
+         ('model', LinearRegression())]
+pipe = Pipeline(Input)
+
+# fit and predict on the pipeline
+pipe.fit(Z, Y)
+Yhat = pipe.predict(Z)
+print(Yhat)
+
+#distribution plots for the polynomial regression from the pipeline
+ax1 = sns.distplot(Y, hist=False, color='r', label="Actual Value")
+ax2 = sns.distplot(Yhat, hist=False, color='b', label="Fitted Values", ax=ax1)
 
