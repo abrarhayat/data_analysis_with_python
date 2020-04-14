@@ -9,24 +9,31 @@ path = 'https://s3-api.us-geo.objectstorage.softlayer.net/cf-courses-data/Cognit
 df = pd.read_csv(path)
 df.head()
 
-X = df['highway-mpg']
+X = df[['highway-mpg']]
 Y = df['price']
 Z = df[['normalized-losses', 'highway-mpg']]
 print(df.head())
 
 # 1d Polynomial Regression
-f = np.polyfit(X, Y, 3)
+# polyfit takes a 1d array
+f = np.polyfit(df['highway-mpg'], Y, 3)
 p = np.poly1d(f)
 print(p)
 
 
 # Multidimensional Polynomial Regression
 pr = PolynomialFeatures(degree=2)
-p_mul_dim =pr.fit_transform([X, Y])
-print('p_mul_dim: ', p_mul_dim)
+# transforming input to a polynomial input with more features
+x_pr = pr.fit_transform(X)
+print('x_pr: ', x_pr)
+
+# fitting the polynomial
+lm = LinearRegression()
+lm.fit(x_pr, Y)
+Yhat = lm.predict(x_pr)
 
 # Scaling
-X_scale = np.array(X).reshape(-1,1)
+X_scale = np.array(X).reshape(-1, 1)
 SCALE = StandardScaler()
 SCALE.fit(X_scale)
 X_scaled = SCALE.fit_transform(X_scale)
@@ -42,7 +49,7 @@ pipe.fit(Z, Y)
 Yhat = pipe.predict(Z)
 print(Yhat)
 
-#distribution plots for the polynomial regression from the pipeline
+# distribution plots for the polynomial regression from the pipeline
 ax1 = sns.distplot(Y, hist=False, color='r', label="Actual Value")
 ax2 = sns.distplot(Yhat, hist=False, color='b', label="Fitted Values", ax=ax1)
 
