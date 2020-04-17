@@ -16,7 +16,7 @@ grid_search = GridSearchCV(rr, parameters, cv=4, return_train_score=True)
 grid_search.fit(x, y)
 
 # print the best estimator config for the model
-print(grid_search.best_estimator_, '\n')
+print('Best Estimator: ', grid_search.best_estimator_, '\n')
 
 # print the results
 scores = grid_search.cv_results_
